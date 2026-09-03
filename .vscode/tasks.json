@@ -47,8 +47,9 @@
     },
     {
       "id": "Scene",
-      "type": "promptString",
-      "description": "Input scene",
+      "type": "pickString",
+      "description": "Select scene",
+      "options": ["scene.xml", "scene_29dof.xml", "scene_trampoline.xml", "scene_bridge.xml"],
       "default": "scene.xml"
     },
   ],
