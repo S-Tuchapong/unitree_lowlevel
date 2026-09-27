@@ -19,7 +19,7 @@ This repository sits between the Unitree communication stack and your controller
   Unitree's DDS-based SDK for Go2 and G1 communication.
 - [unitree_ros2](https://github.com/unitreerobotics/unitree_ros2.git)
   ROS 2 message packages used to decode Unitree topics correctly.
-- [unitree_mujoco](https://github.com/unitreerobotics/unitree_mujoco.git)
+- [unitree_mujoco](https://github.com/Renkunzhao/unitree_mujoco/tree/dev/depth-camera)
   Simulation environment with the same communication interface as the hardware, useful for controller validation before deployment.
 
 Additional documentation in this repo:
@@ -43,6 +43,17 @@ ros2 run unitree_mujoco unitree_mujoco
 ```
 
 Once MuJoCo is running, start the controller node with the matching robot config in another terminal.
+
+Scene names are relative to the selected robot's directory. For G1, use
+`-r g1 -s scene_29dof.xml` or `-r g1 -s scene_bridge.xml` (29 joints, flat feet,
+no payload). Both G1 and Go2 have a `scene_bridge.xml`; `scene_trampoline.xml`
+belongs to Go2. In the VS Code task, select the robot and scene accordingly.
+
+For ordinary G1/Go2 simulation, keep `eval: ""` and `depth_camera.enabled: false`
+in `unitree_mujoco/simulate/config.yaml`. The optional `eval_beam.yaml` enables
+Go2-specific beam monitoring and payloads that require a `base_link` body;
+changing `-r` or `-s` does not turn those features off. Enable the configured
+Go2 depth camera explicitly with `--depth-camera` when needed.
 
 > Note: Unitree MuJoCo reads the installed `config.yaml`. With `--symlink-install`, it points directly to `src/unitree_mujoco/simulate/config.yaml`; otherwise rebuild after changing it. Set `use_joystick: 1` if you want joystick input.
 >
@@ -102,14 +113,24 @@ sudo apt install ros-<ros-distro>-pinocchio ros-<ros-distro>-rmw-cyclonedds-cpp 
 ```bash
 cd unitree_lowlevel
 ./scripts/colcon-config.sh <ros-distro> <Release|Debug>
+# Include the ROS 2 MuJoCo simulator (VS Code: humble -> Release -> sim):
+./scripts/colcon-config.sh humble Release sim
 ```
 
 This script:
 
 - imports repositories listed in `scripts/lib.repos` and `scripts/src.repos`
-- builds and installs `unitree_sdk2`
-- downloads MuJoCo for simulation
+- builds and installs `unitree_sdk2` if it is not already installed in `/opt/unitree_robotics`
+- in `sim` mode, imports the ROS 2 simulator from `scripts/sim.repos` and downloads MuJoCo
 - builds the ROS 2 workspace with `colcon`
+
+The simulator uses the `dev/depth-camera` branch of the linked fork. Its `main`
+branch is a standalone SDK simulator and cannot be built as this ROS 2 package.
+On Ubuntu 22.04, its CMake configuration must support the `yaml-cpp` target name
+(the newer `yaml-cpp::yaml-cpp` target is not provided by Jammy).
+
+Builds default to one package at a time and two compiler jobs to limit memory
+use. Override the compiler limit with `CMAKE_BUILD_PARALLEL_LEVEL` if needed.
 
 ## Runtime Setup
 

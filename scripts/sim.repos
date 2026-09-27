@@ -1,0 +1,5 @@
+repositories:
+  unitree_mujoco:
+    type: git
+    url: https://github.com/Renkunzhao/unitree_mujoco.git
+    version: dev/depth-camera
