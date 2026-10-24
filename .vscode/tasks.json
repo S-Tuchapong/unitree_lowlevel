@@ -94,7 +94,7 @@
       "args": [
         "scripts/ros2_task.sh", "lo", "${input:RosDistro}",
         "ros2", "run", "unitree_mujoco", "unitree_mujoco",
-        "-r", "${input:Robot}", "-s", "${input:Scene}"
+        "-r", "${input:Robot}", "-s", "${input:G1FlatScene}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
